@@ -62,7 +62,7 @@ export default function Reports() {
 
                     <div className="flex items-end justify-between h-40 gap-2">
                         {performanceData.map((val, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-3">
+                            <div key={i} className="flex-1 flex flex-col justify-end items-center gap-3 h-full">
                                 <div
                                     className="w-full bg-background-almondCream/20 rounded-t-xl group-hover:bg-background-almondCream/40 transition-all duration-500"
                                     style={{ height: `${val}%` }}

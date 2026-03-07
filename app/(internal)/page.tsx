@@ -1,7 +1,8 @@
-'use client';
+'use client'; // Indica ser um Client Component no novo App Router
+
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 /**
@@ -148,23 +149,31 @@ export default function Home() {
         </div>
 
         {/* INSIGHTS ESTRATÉGICOS - TEXTO EDITORIAL */}
-        <div className="col-span-12 md:col-span-7 bg-white shadow-premium p-12 rounded-[60px] relative overflow-hidden group">
-          <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-background-almondCream rounded-full opacity-20 group-hover:scale-125 transition-transform duration-1000"></div>
+        <div className="col-span-12 md:col-span-7 bg-white shadow-premium p-6 sm:p-8 md:p-12 rounded-[40px] md:rounded-[60px] relative overflow-hidden group">
+          <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-background-almondCream rounded-full opacity-20 group-hover:scale-125 transition-transform duration-1000 z-0"></div>
           <div className="relative z-10">
-            <span className="text-[10px] font-black uppercase tracking-widest text-foreground-dustyOlive mb-6 block italic">Análise do Estrategista</span>
-            <h4 className="text-2xl font-black text-editorial leading-tight mb-6">
+            <span className="text-[10px] font-black uppercase tracking-widest text-foreground-dustyOlive mb-4 md:mb-6 block italic">Análise do Estrategista</span>
+            <h4 className="text-xl md:text-2xl font-black text-editorial leading-tight mb-6">
               A preservação de capital em cenários de volatilidade é a prioridade deste trimestre.
             </h4>
-            <div className="flex items-center gap-6">
-              <div className="flex-1">
-                <p className="text-xs font-bold leading-relaxed opacity-60">
+
+            {/* NOVO LAYOUT MAIS SEGURO: Stacks verticalmente em mobile, linha em desktop */}
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="w-full sm:flex-1">
+                <p className="text-sm sm:text-xs font-bold leading-relaxed opacity-60">
                   Nossa tese de <span className="underline italic">Gestão Conservadora</span> recomenda a manutenção de ativos de alta liquidez frente à incerteza global.
                 </p>
               </div>
-              <button className="whitespace-nowrap px-8 py-4 bg-background-almondCream rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-background-ashGrey/20 transition-all border border-foreground-darkOlive/10">
-                Acessar Relatório
-              </button>
+              <div className="w-full sm:w-auto">
+                <Link
+                  href="/reports"
+                  className="inline-block text-center w-full sm:w-auto whitespace-nowrap px-8 py-4 bg-background-almondCream rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-background-ashGrey/20 transition-all border border-foreground-darkOlive/10"
+                >
+                  Acessar Relatório
+                </Link>
+              </div>
             </div>
+
           </div>
         </div>
 
