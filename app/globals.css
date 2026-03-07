@@ -1,26 +1,224 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Tons terrosos e naturais para a paleta CactuSync */
+  --background-dustyOlive: #6b705c;
+  --background-almondCream: #fdf0e6;
+  --background-ashGrey: #a5a58d;
+  --foreground-white: #ffffff;
+  --foreground-dustyOlive: #6b705c;
+  --foreground-darkOlive: #4a4e40;
+  --accent-sun: #f2d1b9;
+  /* Cor do sol, puxada para o pêssego quente */
+  /* Organic Border Radius Tokens - True "Liquid Blob" feel */
+  --radius-handcrafted: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  --radius-organic-lg: 30% 70% 41% 59% / 51% 29% 71% 49%;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background-dustyOlive: var(--background-dustyOlive);
+  --color-background-almondCream: var(--background-almondCream);
+  --color-background-ashGrey: var(--background-ashGrey);
+  --color-foreground-white: var(--foreground-white);
+  --color-foreground-dustyOlive: var(--foreground-dustyOlive);
+  --color-foreground-darkOlive: var(--foreground-darkOlive);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background-dustyOlive: #6b705c;
+    --background-almondCream: #ffe8d6;
+    --background-ashGrey: #b7b7a4;
+    --foreground-white: #ffff;
+    --foreground-dustyOlive: #6b705c;
   }
 }
 
+/* Elementos do Deserto Minimalista */
+.desert-dune {
+  background-color: #f2d1b9;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  position: absolute;
+  bottom: 0;
+  border-top: 1px solid rgba(107, 112, 92, 0.15);
+  /* Linha sutil para dar definição ao topo da duna */
+}
+
+.cactus-body {
+  /* Gradiente para dar volume e tom de sombra orgânica */
+  background: linear-gradient(180deg, var(--background-dustyOlive) 0%, var(--foreground-darkOlive) 100%);
+  border-radius: 45% 45% 10% 10% / 60% 60% 5% 5%;
+  position: relative;
+  box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.cactus-arm {
+  background: inherit;
+  /* Segue o gradiente do corpo principal */
+  position: absolute;
+  z-index: -1;
+}
+
+.cactus-arm.left {
+  border-radius: 40px 0 40px 40px;
+  transform: rotate(-15deg);
+}
+
+.cactus-arm.right {
+  border-radius: 0 40px 40px 40px;
+  transform: rotate(15deg);
+}
+
+/* Detalhes de espinhos minimalistas */
+.cactus-detail {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.15);
+  width: 1px;
+  height: 6px;
+  border-radius: 1px;
+}
+
+/* Elementos Celestiais e Textura de Fundo */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(107, 112, 92, 0.25) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.minimalist-sun {
+  background-color: var(--accent-sun);
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(242, 209, 185, 0.4);
+  /* Brilho solar suave */
+}
+
+.bird {
+  position: absolute;
+  width: 14px;
+  height: 5px;
+  border: 1.5px solid var(--foreground-darkOlive);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  /* Forma de 'V' invertido para o pássaro */
+  opacity: 0.7;
+}
+
+/* Animações Ambientais */
+@keyframes sway {
+
+  /* Balanço leve para os cactos */
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes float {
+
+  /* Flutuação suave para os pássaros */
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.card-organic {
+  border-radius: var(--radius-handcrafted);
+  transition: border-radius 0.5s ease-in-out;
+}
+
+.card-organic:hover {
+  border-radius: var(--radius-organic-lg);
+}
+
+.shadow-premium {
+  /* Sombras simplificadas para melhor performance de scroll */
+  box-shadow: 0 4px 20px rgba(74, 78, 64, 0.08);
+}
+
+.text-editorial {
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.texture-grainy {
+  position: relative;
+}
+
+.texture-grainy::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.015;
+  pointer-events: none;
+  background: url("https://www.transparenttextures.com/patterns/p6.png");
+  /* Ruído estático mais performático */
+}
+
+.animate-sway {
+  animation: sway 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background-dustyOlive);
+  color: var(--foreground-white);
+  /* Para a imagem rotacionada e escalada, o topo esquerdo do cacto fica exatamente em x=19, y=0 nos 48px */
+  cursor: url('/cactus-cursor.svg') 19 0, auto;
+}
+
+/* Optional: ensure pointer elements use the custom cursor too, or a variation of it */
+a,
+button,
+input,
+select,
+textarea,
+[role="button"] {
+  /* O topo esquerdo da flor rotacionada fica exatamente em x=24, y=2 nos 48px */
+  cursor: url('/cactus-pointer.svg') 24 2, pointer;
+}
+
+/* --- ESTILIZAÇÃO DA SCROLLBAR GLOBAL --- */
+/* Funciona primariamente em browsers baseados em Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-almondCream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--background-dustyOlive);
+  border-radius: 8px;
+  border: 2px solid var(--background-almondCream);
+  /* Cria um "gap" falso */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-darkOlive);
+}
+
+/* Firefox alternativo (propriedades standard limitadas) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--background-dustyOlive) var(--background-almondCream);
 }

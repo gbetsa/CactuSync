@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1" dy="1" stdDeviation="1.5" flood-color="#4a4e40" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Para o modo pointer (mãozinha), o cacto fica mais reto e vibrante com uma florzinha -->
+  <g filter="url(#shadow)" transform="translate(6, 4) rotate(-10) scale(0.9)">
+    
+    <!-- Corpo do cacto principal -->
+    <path d="M12 4 L16 4 L16 20 L12 20 Z" fill="#4a4e40" rx="2" />
+    <path d="M12 4 Q 14 1 16 4" fill="#4a4e40" />
+    <path d="M12 20 Q 14 22 16 20" fill="#4a4e40" />
+
+    <!-- Braço Esquerdo -->
+    <path d="M12 12 Q8 12 9 8" fill="none" stroke="#4a4e40" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Braço Direito -->
+    <path d="M16 15 Q20 15 19 10" fill="none" stroke="#4a4e40" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Flor no topo, indicando interatividade -->
+    <circle cx="14" cy="2" r="3" fill="#f2d1b9" />
+    <circle cx="14" cy="2" r="1.5" fill="#e0a96d" />
+
+    <!-- Detalhes do cacto / Espinhos em branco vivo -->
+    <circle cx="14" cy="7" r="1" fill="#ffffff" />
+    <circle cx="14" cy="11" r="1" fill="#ffffff" />
+    <circle cx="14" cy="15" r="1" fill="#ffffff" />
+    <circle cx="14" cy="19" r="1" fill="#ffffff" />
+    
+    <!-- Base (estilo de flecha do mouse compacta) -->
+    <path d="M10 20 L18 20 L14 26 Z" fill="#6b705c" />
+  </g>
+</svg>
