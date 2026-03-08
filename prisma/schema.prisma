@@ -15,5 +15,43 @@ model User {
   name      String?
   password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt    
+  updatedAt DateTime @updatedAt
+  assets    Asset[]
+}
+
+model Asset {
+  id           Int       @id @default(autoincrement())
+  symbol       String // Ex: PETR4, BTC, AAPL
+  name         String? // Ex: Petrobras S.A.
+  type         AssetType // Enum: STOCK, CRYPTO, FIXED_INCOME, etc.
+  quantity     Float     @default(0)
+  averagePrice Float     @default(0) // Preço Médio de Compra
+
+  // Relacionamento com o Usuário
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  // Histórico de movimentações deste ativo
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Transaction {
+  id       Int      @id @default(autoincrement())
+  type     String // "BUY" ou "SELL"
+  quantity Float
+  price    Float
+  date     DateTime @default(now())
+
+  assetId Int
+  asset   Asset @relation(fields: [assetId], references: [id])
+}
+
+enum AssetType {
+  STOCK
+  CRYPTO
+  FIXED_INCOME
+  REAL_ESTATE
+  OTHER
 }
