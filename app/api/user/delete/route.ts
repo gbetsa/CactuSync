@@ -1,4 +1,3 @@
-import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
@@ -6,30 +5,25 @@ import { prisma } from "@/lib/prisma";
  * Rota API DELETE: /api/user/delete
  * Responsável por remover a conta permanentemente e invalidar a sessão atual.
  */
-export async function DELETE() {
-    // 1. Garante que só quem está logado tenha acesso a esta rota destrutiva
-    const token = (await cookies()).get("auth-token")?.value;
+export async function DELETE(req: Request) {
+    // 1. Pegamos o email diretamente do header que o proxy injetou
+    const email = req.headers.get('x-user-email');
 
-    if (!token) {
+    if (!email) {
         return Response.json({ error: "Não autenticado" }, { status: 401 });
     }
 
     try {
-        // 2. Resolve o JWT para determinar qual conta deve ser excluída (usando a assinatura confiável do servidor)
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        const email = payload.email as string;
-
-        // 3. Executa a deleção no banco de dados via Prisma ORM
+        // 2. Executa a deleção no banco de dados via Prisma ORM
         // A exclusão garante que todos os dados relacionados ao email sejam perdidos.
         await prisma.user.delete({
             where: { email },
         });
 
-        // 4. Invalida a sessão forçando a expiração do cookie (como na rota de logout)
+        // 2. Invalida a sessão forçando a expiração do cookie (como na rota de logout)
         (await cookies()).delete("auth-token");
 
-        // 5. Responde que tudo ocorreu bem para que o frontend redirecione o usuário à tela final
+        // 3. Responde que tudo ocorreu bem para que o frontend redirecione o usuário à tela final
         return Response.json({ success: true });
 
     } catch (error) {

@@ -30,11 +30,8 @@ export default function Profile() {
             // Se o usuário está logado, preenchemos o form com os dados já conhecidos
             setName(user.name || "");
             setEmail(user.email);
-        } else {
-            // Se não há usuário na memória/cookie, expulsa para o login
-            router.push("/login");
         }
-    }, [user, router]); // Só roda dnv se o user mudar
+    }, [user]); // Só roda dnv se o user mudar
 
     if (!user) return null; // Previne renderizações mortas antes do redirecionamento
 

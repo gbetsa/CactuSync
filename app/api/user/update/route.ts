@@ -8,10 +8,10 @@ import bcrypt from "bcryptjs";
  * Responsável por atualizar o perfil do usuário logado (nome, e-mail e/ou senha).
  */
 export async function POST(req: Request) {
-    // 1. Confirmação de Autenticação: Verifica se há um token de sessão válido no cookie
-    const token = (await cookies()).get("auth-token")?.value;
+    // 1. Pegamos o email diretamente do header que o proxy injetou
+    const email = req.headers.get('x-user-email');
 
-    if (!token) {
+    if (!email) {
         return Response.json({ error: "Não autenticado" }, { status: 401 });
     }
 
@@ -19,12 +19,7 @@ export async function POST(req: Request) {
         // 2. Extrai os dados enviados pelo formulário
         const { name, email, password, currentPassword } = await req.json();
 
-        // 3. Validação do JWT e identificação do usuário atual (o dono do token)
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        const currentEmail = payload.email as string;
-
-        // 4. Fluxo de Segurança Opcional: Se o usuário estiver tentando trocar a senha
+        // 3. Fluxo de Segurança Opcional: Se o usuário estiver tentando trocar a senha
         if (password) {
             // Exige a senha atual como medida de segurança
             if (!currentPassword) {
@@ -32,7 +27,7 @@ export async function POST(req: Request) {
             }
 
             // Busca o hash atual no banco e compara com a senha atual informada
-            const dbUser = await prisma.user.findUnique({ where: { email: currentEmail }, select: { password: true } });
+            const dbUser = await prisma.user.findUnique({ where: { email }, select: { password: true } });
             const isValid = dbUser && await bcrypt.compare(currentPassword, dbUser.password);
 
             if (!isValid) {
@@ -40,8 +35,8 @@ export async function POST(req: Request) {
             }
         }
 
-        // 5. Verificação de Conflito: Se o e-mail novo for solicitado, verifica se pertence a outro usuário
-        if (email && email !== currentEmail) {
+        // 4. Verificação de Conflito: Se o e-mail novo for solicitado, verifica se pertence a outro usuário
+        if (email && email !== email) {
             const existingUser = await prisma.user.findUnique({ where: { email } });
             if (existingUser) {
                 return Response.json({ error: "Este e-mail já está em uso" }, { status: 400 });
@@ -59,7 +54,7 @@ export async function POST(req: Request) {
 
         // 7. Atualização do banco de dados (Prisma) limitando o objeto modificado pelo email validado do token
         const updatedUser = await prisma.user.update({
-            where: { email: currentEmail },
+            where: { email },
             data: updateData,
             select: { name: true, email: true, updatedAt: true } // Novamente omitindo a senha do retorno
         });

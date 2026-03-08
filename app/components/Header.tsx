@@ -4,6 +4,7 @@ import { useAuthStore } from '@/app/store/useAuthStore';
 import { usePathname } from 'next/navigation';
 import { CactusLogo } from './CactusLogo';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /**
  * Componente de Cabeçalho Global (Header)
@@ -13,6 +14,7 @@ import { useState } from 'react';
 export const Header = () => {
     // 1. Acesso ao Zustand para pegar os dados do usuário e a função de logout
     const { user, logout } = useAuthStore();
+    const router = useRouter();
 
     // 2. Extrai a URL atual para detectar qual aba do menu deve ficar sublinhada (ativa)
     const pathname = usePathname();
@@ -23,6 +25,11 @@ export const Header = () => {
     // Funções auxiliares para manipular o menu de forma legível
     const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMenu = () => setIsMobileMenuOpen(false);
+
+    const handleLogout = async () => {
+        await logout(); // Espera o logout (limpar cookie)
+        router.push("/login"); // Manda pro login manualmente
+    };
 
     return (
         <header className="flex justify-between items-end px-8 lg:px-20 py-10 z-50 relative">
@@ -48,7 +55,7 @@ export const Header = () => {
             <div className="flex items-center gap-4 lg:gap-6">
                 {/* Botão de Encerrar Sessão: Dispara a ação de limpar o Cookie via API */}
                 <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="p-2 text-foreground-darkOlive hover:text-red-600 transition-colors cursor-pointer rounded-full hover:bg-red-100"
                     aria-label="Encerrar Sessão"
                     title="Encerrar Sessão"

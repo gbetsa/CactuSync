@@ -1,8 +1,5 @@
 'use client';
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import Link from "next/link";
 import { CactusLogo } from "@/app/components/CactusLogo";
 
 /**
@@ -12,14 +9,6 @@ import { CactusLogo } from "@/app/components/CactusLogo";
  */
 export default function Reports() {
     const user = useAuthStore((state) => state.user);
-    const router = useRouter();
-
-    // Barreira de proteção padrão
-    useEffect(() => {
-        if (!user) {
-            router.push("/login");
-        }
-    }, [user, router]);
 
     if (!user) {
         return null; // Evita lampejos de layout

@@ -1,8 +1,6 @@
 'use client'; // Indica ser um Client Component no novo App Router
 
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 /**
@@ -12,16 +10,6 @@ import Link from "next/link";
 export default function Home() {
   // Puxa o objeto do usuário logado diretamente da memória (Zustand persiste isso do localStorage)
   const user = useAuthStore((state) => state.user);
-  const router = useRouter();
-
-  // Efeito de Redirecionamento de Proteção
-  // Roda uma vez quando a tela carrega e sempre que a variável 'user' mudar
-  useEffect(() => {
-    if (!user) {
-      // Barreira de segurança frontend: Caiu aqui sem estar logado, expulsa pro /login
-      router.push("/login");
-    }
-  }, [user, router]); // Dependências do React: dispara apenas quando esses valores atualizam
 
   // Trava de renderização: Evita "piscar" a dashboard vazia/quebrada antes de redirecionar 
   // caso o usuário consiga acessar a rota limpa e o useEffect ainda esteja rodando
