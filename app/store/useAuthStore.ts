@@ -126,7 +126,7 @@ export const useAuthStore = create<AuthState>()(
                 set({ isLoading: true, error: null });
                 try {
                     const response = await fetch("/api/user/update", {
-                        method: "POST",
+                        method: "PUT",
                         body: JSON.stringify(data),
                     });
                     const result = await response.json();
