@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { UserService } from "../services/user.service";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
+import { ZodError } from "zod";
+import { loginSchema, registerSchema, updateSchema } from "../schemas/user.schema";
 
 export class UserController {
     private userService = new UserService();
@@ -29,14 +31,19 @@ export class UserController {
     // POST /api/login
     async login(req: Request) {
         try {
-            const { email, password } = await req.json();
-            const user = await this.userService.login(email, password);
+            const body = await req.json();
+            const data = loginSchema.parse(body);
+
+            const user = await this.userService.login(data.email, data.password);
 
             // Chamada para gerar Token e salvar
             await this.generateTokenAndSetCookie(user.email);
 
             return NextResponse.json({ message: "Login realizado com sucesso" });
         } catch (error: any) {
+            if (error instanceof ZodError) {
+                return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+            }
             return NextResponse.json({ error: "Email ou senha inválidos" }, { status: 401 });
         }
     }
@@ -44,8 +51,10 @@ export class UserController {
     // POST /api/register
     async register(req: Request) {
         try {
-            const { name, email, password } = await req.json();
-            const user = await this.userService.register(name, email, password);
+            const body = await req.json();
+            const data = registerSchema.parse(body);
+
+            const user = await this.userService.register(data.name, data.email, data.password);
 
             // Chamada para gerar Token e salvar
             await this.generateTokenAndSetCookie(user.email);
@@ -55,6 +64,9 @@ export class UserController {
                 user: { email: user.email, name: user.name }
             }, { status: 201 });
         } catch (error: any) {
+            if (error instanceof ZodError) {
+                return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+            }
             const msg = error.message === "EMAIL_ALREADY_IN_USE"
                 ? "Este e-mail já está cadastrado"
                 : "Erro ao cadastrar";
@@ -81,10 +93,15 @@ export class UserController {
             const email = req.headers.get('x-user-email');
             if (!email) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-            const data = await req.json();
+            const body = await req.json();
+            const data = updateSchema.parse(body);
+
             const updatedUser = await this.userService.updateProfile(email, data);
             return NextResponse.json({ message: "Perfil atualizado", user: updatedUser });
         } catch (error: any) {
+            if (error instanceof ZodError) {
+                return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+            }
             // Tratamento de erros amigáveis vindo do Service
             const messages: any = {
                 "INVALID_PASSWORD": "Senha atual incorreta",
