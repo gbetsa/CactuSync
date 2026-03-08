@@ -7,25 +7,27 @@ export default async function proxy(request: NextRequest) {
 
     // 1. REGRA PARA QUALQUER ROTA DE API
     if (pathname.startsWith('/api/')) {
-        // Se for uma rota que precisa de login (user ou logout)
-        if (pathname.startsWith('/api/user') || pathname === '/api/logout') {
+        // Se for uma rota que precisa de login (user, assets ou logout)
+        const isProtectedApi = pathname.startsWith('/api/user') ||
+            pathname.startsWith('/api/assets') ||
+            pathname === '/api/logout';
+
+        if (isProtectedApi) {
             if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-            // Apenas para rotas de /api/user nós injetamos o email via JWT
-            if (pathname.startsWith('/api/user')) {
-                try {
-                    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-                    const { payload } = await jwtVerify(token, secret);
-                    const requestheaders = new Headers(request.headers);
-                    requestheaders.set('x-user-email', payload.email as string);
-                    return NextResponse.next({ request: { headers: requestheaders } });
-                } catch (e) {
-                    return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-                }
+            // Injetamos o email via JWT para rotas protegidas
+            try {
+                const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+                const { payload } = await jwtVerify(token, secret);
+                const requestheaders = new Headers(request.headers);
+                requestheaders.set('x-user-email', payload.email as string);
+                return NextResponse.next({ request: { headers: requestheaders } });
+            } catch (e) {
+                return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
             }
         }
 
-        // Se for login/register ou logout com token, continua normal
+        // Se for login/register, continua normal
         return NextResponse.next();
     }
 
