@@ -29,10 +29,28 @@ export class AssetService {
         if (!user) throw new Error("USER_NOT_FOUND");
 
         const assets = await this.assetRepository.findByUserId(user.id);
+        const totalValue = assets.reduce((sum, asset) => sum + (asset.quantity * asset.averagePrice), 0);
+
+        // Calcula Distribuição por Tipo
+        const distribution: Record<string, number> = {
+            STOCK: 0,
+            CRYPTO: 0,
+            FIXED_INCOME: 0,
+            REAL_ESTATE: 0,
+            OTHER: 0
+        };
+
+        if (totalValue > 0) {
+            assets.forEach(asset => {
+                const assetValue = asset.quantity * asset.averagePrice;
+                distribution[asset.type] += (assetValue / totalValue) * 100;
+            });
+        }
 
         return {
             assets,
-            totalAssets: assets.length,
+            totalAssets: totalValue,
+            distribution
         };
     }
 

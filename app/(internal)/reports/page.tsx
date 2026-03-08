@@ -1,116 +1,187 @@
 'use client';
+
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAssetStore } from "@/app/store/useAssetStore";
 import { CactusLogo } from "@/app/components/CactusLogo";
+import { AssetCard } from "@/app/components/AssetCard";
+import { AddAssetModal } from "@/app/components/AddAssetModal";
+import { ConfirmModal } from "@/app/components/ConfirmModal";
+import { Button } from "@/app/components/Button";
 
 /**
- * Página de Relatórios e Análises
- * Exibe gráficos estáticos e uma lista ficcional de documentos PDF.
- * Também protegida contra acessos não autorizados.
+ * Dashboard de Investimentos Dinâmico
+ * Consome dados reais do backend via useAssetStore.
  */
 export default function Reports() {
     const user = useAuthStore((state) => state.user);
+    const { assets, totalAssets, distribution, isLoading, fetchDashboard, deleteAsset } = useAssetStore();
 
-    if (!user) {
-        return null; // Evita lampejos de layout
-    }
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [editingAsset, setEditingAsset] = useState<any>(null);
+    const [assetToDelete, setAssetToDelete] = useState<number | null>(null);
 
-    // Dados Fictícios de Relatórios para fins de exibição (Estudos)
-    const reports = [
-        { title: "Análise Macroeconômica", date: "Jan 2026", type: "PDF" },
-        { title: "Performance de Portfólio", date: "Dez 2025", type: "PDF" },
-        { title: "Estratégia Trimestral", date: "Nov 2025", type: "XLS" },
-        { title: "Audit de Custódia", date: "Out 2025", type: "PDF" },
-    ];
+    useEffect(() => {
+        if (user) {
+            fetchDashboard();
+        }
+    }, [user, fetchDashboard]);
 
-    // Dados percentuais ficcionais (Estudos) para preencher os gráficos no Grid
-    const performanceData = [40, 65, 55, 85, 70, 95];
+    if (!user) return null;
+
+    const handleEdit = (asset: any) => {
+        setEditingAsset(asset);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteClick = (id: number) => {
+        setAssetToDelete(id);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (assetToDelete) {
+            await deleteAsset(assetToDelete);
+            setIsConfirmOpen(false);
+            setAssetToDelete(null);
+        }
+    };
+
+    const handleOpenModal = () => {
+        setEditingAsset(null);
+        setIsModalOpen(true);
+    };
 
     return (
         <main className="px-8 lg:px-20 pb-20 max-w-[1600px] mx-auto animate-in fade-in duration-700">
-            <div className="grid grid-cols-12 gap-6 lg:gap-10 items-stretch">
+            <div className="grid grid-cols-12 gap-6 lg:gap-10 items-start">
 
-                {/* HERO - RELATÓRIOS */}
-                <section className="col-span-12 lg:col-span-7 bg-white card-organic p-12 lg:p-20 shadow-premium border border-background-almondCream flex flex-col justify-center min-h-[400px]">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground-dustyOlive mb-6 block italic">Inteligência Privada</span>
-                    <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-editorial mb-8 leading-none">
-                        Relatórios<br /><span className="italic font-light opacity-50">& Análises</span>
-                    </h1>
-                    <p className="text-lg font-bold opacity-60 leading-relaxed max-w-md">
-                        Transparência absoluta e dados granulares sobre a evolução do seu patrimônio sob nossa custódia.
-                    </p>
+                {/* HERO - PATRIMÔNIO TOTAL (SOLITÁRIO NO TOPO) */}
+                <section className="col-span-12 bg-white card-organic p-12 lg:p-20 shadow-premium border border-background-almondCream flex flex-col justify-center min-h-[280px]">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground-dustyOlive mb-6 block italic text-center lg:text-left">Patrimônio sob Custódia</span>
+                    <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
+                        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-editorial leading-tight text-center lg:text-left break-all">
+                            R$ {totalAssets.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </h1>
+                        <div className="flex flex-col sm:flex-row gap-6 items-center lg:items-end flex-shrink-0">
+                            <p className="text-base lg:text-lg font-bold opacity-60 leading-relaxed max-w-xs text-center lg:text-right">
+                                Total consolidado de todos os seus ativos integrados.
+                            </p>
+                            <Button
+                                onClick={handleOpenModal}
+                                text="+ Adicionar Ativo"
+                                variant="primary"
+                            />
+                        </div>
+                    </div>
                 </section>
 
-                {/* PERFORMANCE CHART - CSS BARS */}
-                <div className="col-span-12 lg:col-span-5 bg-background-dustyOlive p-10 rounded-[60px] shadow-premium text-background-almondCream flex flex-col justify-between overflow-hidden relative group">
+                {/* DISTRIBUIÇÃO - LINHA CENTRAL (ESQUERDA) */}
+                <div className="col-span-12 lg:col-span-8 bg-background-dustyOlive p-10 rounded-[60px] shadow-premium text-background-almondCream flex flex-col justify-between overflow-hidden relative group min-h-[400px]">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
 
                     <div>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Evolução Patrimonial</span>
-                        <h3 className="text-3xl font-black tracking-tighter mt-2 mb-10">Crescimento 2026</h3>
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Composição de Carteira</span>
+                        <h3 className="text-3xl font-black tracking-tighter mt-2 mb-10">Distribuição por Categoria</h3>
                     </div>
 
-                    <div className="flex items-end justify-between h-40 gap-2">
-                        {performanceData.map((val, i) => (
-                            <div key={i} className="flex-1 flex flex-col justify-end items-center gap-3 h-full">
+                    <div className="flex items-end justify-between h-48 gap-4 px-4">
+                        {(Object.entries(distribution) as [string, number][]).map(([key, val], i) => (
+                            <div key={key} className="flex-1 flex flex-col justify-end items-center gap-3 h-full">
                                 <div
-                                    className="w-full bg-background-almondCream/20 rounded-t-xl group-hover:bg-background-almondCream/40 transition-all duration-500"
-                                    style={{ height: `${val}%` }}
-                                ></div>
-                                <span className="text-[9px] font-black opacity-40 uppercase tracking-tighter">M{i + 1}</span>
+                                    className="w-full bg-background-almondCream/20 rounded-t-2xl group-hover:bg-background-almondCream/40 transition-all duration-500 relative"
+                                    style={{ height: `${Math.max(val, 2)}%` }} // Mínimo de 2% para visibilidade
+                                    title={`${key}: ${val.toFixed(1)}%`}
+                                >
+                                    {val > 5 && (
+                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black opacity-30">
+                                            {val.toFixed(0)}%
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter">
+                                    {key === "FIXED_INCOME" ? "REND. FIXA" : key === "REAL_ESTATE" ? "FIIs" : key === "STOCK" ? "AÇÕES" : key === "CRYPTO" ? "CRIPTO" : "OUTROS"}
+                                </span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* COMPOSIÇÃO DE CARTEIRA - VISUAL BENTO */}
-                <div className="col-span-12 md:col-span-4 bg-background-ashGrey/10 p-10 card-organic border border-white flex flex-col justify-between min-h-[300px]">
+                {/* STATUS DA CARTEIRA - LINHA CENTRAL (DIREITA) */}
+                <div className="col-span-12 lg:col-span-4 bg-background-ashGrey/10 p-10 card-organic border border-white flex flex-col justify-between min-h-[400px]">
                     <div>
-                        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-6">Risco Estratégico</h4>
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full border-4 border-foreground-darkOlive flex items-center justify-center">
-                                    <span className="text-xs font-black">A+</span>
-                                </div>
-                                <div>
-                                    <p className="text-xs font-black uppercase">Rating de Liquidez</p>
-                                    <p className="text-[10px] font-bold opacity-50 italic">Excelente</p>
-                                </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-10">Status & Saúde</h4>
+                        <div className="flex flex-col items-center justify-center py-6">
+                            <div className="w-32 h-32 rounded-full border-8 border-foreground-darkOlive flex items-center justify-center shadow-inner mb-6">
+                                <span className="text-3xl font-black text-editorial">{assets.length > 0 ? "OK" : "--"}</span>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-sm font-black uppercase tracking-widest">{assets.length} Ativos Ativos</p>
+                                <p className="text-xs font-bold opacity-40 italic mt-1">Monitoramento em Tempo Real</p>
                             </div>
                         </div>
                     </div>
-                    <p className="text-[10px] font-bold leading-relaxed opacity-60">
-                        Carteira reajustada para suportar volatilidade extrema de curto prazo.
+                    <p className="text-[10px] font-bold leading-relaxed opacity-40 text-center uppercase tracking-tighter">
+                        CactuSync Engine v1.0 • Dados Liquidados
                     </p>
                 </div>
 
-                {/* ARQUIVO DE RELATÓRIOS - LISTA DESIGN */}
-                <div className="col-span-12 md:col-span-8 bg-white shadow-premium p-10 rounded-[40px] border border-background-almondCream">
+                {/* LISTA DE ATIVOS (OCUPA A LARGURA TOTAL ABAIXO) */}
+                <div className="col-span-12 bg-white shadow-premium p-10 rounded-[40px] border border-background-almondCream">
                     <div className="flex justify-between items-center mb-10">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40">Arquivo Histórico</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40">Seus Investimentos</h4>
                         <div className="w-10 h-10 rounded-full bg-background-almondCream flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity cursor-pointer">
                             <CactusLogo />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {reports.map((report, i) => (
-                            <div key={i} className="group p-6 bg-background-almondCream/30 rounded-3xl border border-transparent hover:border-foreground-darkOlive/10 hover:bg-white transition-all cursor-pointer flex justify-between items-center">
-                                <div>
-                                    <h5 className="text-sm font-black tracking-tighter mb-1">{report.title}</h5>
-                                    <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{report.date}</p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-[9px] font-black px-3 py-1 bg-background-ashGrey/20 rounded-full">{report.type}</span>
-                                    <div className="w-6 h-6 rounded-full bg-foreground-darkOlive flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform duration-300">
-                                        <span className="text-[10px]">↓</span>
-                                    </div>
-                                </div>
+                    {isLoading ? (
+                        <div className="flex justify-center p-20 italic opacity-50">Carregando seus ativos...</div>
+                    ) : assets.length === 0 ? (
+                        <div className="text-center p-20 border-2 border-dashed border-background-almondCream rounded-[40px]">
+                            <p className="text-sm font-bold opacity-40 mb-4">Você ainda não possui ativos registrados.</p>
+                            <Button
+                                onClick={handleOpenModal}
+                                text="Cadastrar Primeiro Ativo"
+                                variant="ghost"
+                            />
+                        </div>
+                    ) : (
+                        <div className="max-h-[520px] overflow-y-auto pr-4 custom-scrollbar pb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {assets.map((asset) => (
+                                    <AssetCard
+                                        key={asset.id}
+                                        symbol={asset.symbol}
+                                        type={asset.type}
+                                        quantity={asset.quantity}
+                                        averagePrice={asset.averagePrice}
+                                        onEdit={() => handleEdit(asset)}
+                                        onDelete={() => handleDeleteClick(asset.id)}
+                                    />
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
             </div>
+
+            <AddAssetModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                editingAsset={editingAsset}
+            />
+
+            <ConfirmModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Excluir Ativo"
+                message="Tem certeza que deseja remover este investimento da sua carteira? Esta ação não pode ser desfeita."
+                isLoading={isLoading}
+            />
         </main>
     );
 }

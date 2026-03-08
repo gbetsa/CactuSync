@@ -205,6 +205,7 @@ export default function Login() {
                             type="submit"
                             text={isLogin ? "Entrar na Plataforma" : "Finalizar Cadastro"}
                             isLoading={isLoading}
+                            variant="primary"
                         />
 
                         {/* Link para alternar entre Login e Cadastro */}

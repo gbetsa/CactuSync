@@ -157,6 +157,7 @@ export default function Profile() {
                                     type="submit"
                                     isLoading={isLoading}
                                     text={isLoading ? "Sincronizando..." : "Salvar Alterações"}
+                                    variant="primary"
                                 />
 
                                 <div className="hidden md:block">
@@ -182,26 +183,26 @@ export default function Profile() {
                             </div>
 
                             {!showDeleteConfirm ? (
-                                <button
+                                <Button
                                     onClick={() => setShowDeleteConfirm(true)}
-                                    className="w-full sm:w-auto px-6 lg:px-8 py-4 lg:py-5 bg-red-600 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-700 transition-all shadow-xl shadow-red-200 cursor-pointer"
-                                >
-                                    Apagar Identidade
-                                </button>
+                                    text="Apagar Identidade"
+                                    variant="danger"
+                                    className="w-full sm:w-auto"
+                                />
                             ) : (
                                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-in zoom-in-95 duration-300 w-full sm:w-auto">
-                                    <button
+                                    <Button
                                         onClick={handleDelete}
-                                        className="w-full sm:w-auto px-6 lg:px-8 py-4 lg:py-5 bg-red-900 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] cursor-pointer"
-                                    >
-                                        Tenho Certeza
-                                    </button>
-                                    <button
+                                        text="Tenho Certeza"
+                                        variant="danger"
+                                        className="w-full sm:w-auto bg-red-900"
+                                    />
+                                    <Button
                                         onClick={() => setShowDeleteConfirm(false)}
-                                        className="w-full sm:w-auto px-6 lg:px-8 py-4 lg:py-5 bg-white text-red-600 font-black text-[10px] uppercase tracking-[0.2em] border border-red-200 rounded-full cursor-pointer"
-                                    >
-                                        Abortar
-                                    </button>
+                                        text="Abortar"
+                                        variant="ghost"
+                                        className="w-full sm:w-auto !text-red-600 border-red-200"
+                                    />
                                 </div>
                             )}
                         </div>

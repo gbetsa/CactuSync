@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/app/store/useAuthStore";
 import Link from "next/link";
+import { Button } from "@/app/components/Button";
 
 /**
  * Página Principal (Dashboard Interno / Portfólio)
@@ -64,9 +65,11 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 flex flex-col gap-6">
-            <button className="w-full py-4 bg-foreground-darkOlive text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-background-dustyOlive transition-all shadow-lg shadow-foreground-darkOlive/10">
-              Resgatar para Conta Corrente
-            </button>
+            <Button
+              text="Resgatar para Conta Corrente"
+              variant="primary"
+              className="w-full"
+            />
             <p className="text-[9px] font-bold leading-relaxed opacity-50 text-center px-4">
               Saldo garantido por mecanismo de proteção de ativos.
             </p>
@@ -153,12 +156,12 @@ export default function Home() {
                 </p>
               </div>
               <div className="w-full sm:w-auto">
-                <Link
+                <Button
                   href="/reports"
-                  className="inline-block text-center w-full sm:w-auto whitespace-nowrap px-8 py-4 bg-background-almondCream rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-background-ashGrey/20 transition-all border border-foreground-darkOlive/10"
-                >
-                  Acessar Relatório
-                </Link>
+                  text="Acessar Relatório"
+                  variant="ghost"
+                  className="w-full sm:w-auto"
+                />
               </div>
             </div>
 
